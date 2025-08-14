@@ -17,12 +17,12 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
-  origin: 'https://red-reserve.vercel.app/', 
-  credentials: true             
+  origin: (origin, callback) => callback(null, origin || '*'),
+  credentials: true
 }));
 
-app.options('*', cors({             // handle preflight for all routes
-  origin: 'https://red-reserve.vercel.app/',
+app.options('*', cors({
+  origin: (origin, callback) => callback(null, origin || '*'),
   credentials: true
 }));
 
