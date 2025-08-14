@@ -17,7 +17,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
-  origin: 'https://rrbackend.vercel.app',
+  origin: 'https://red-reserve.vercel.app',
   credentials: true,
 }));
 
