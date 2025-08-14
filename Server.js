@@ -16,12 +16,16 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
+const allowedOrigin = 'https://red-reserve.vercel.app';
+
 app.use(cors({
-  origin: '*',
+  origin: allowedOrigin,
+  credentials: true,
 }));
 
-app.options('*', cors({ 
-  origin: '*', 
+app.options('*', cors({
+  origin: allowedOrigin,
+  credentials: true,
 }));
 
 // MongoDB connection
