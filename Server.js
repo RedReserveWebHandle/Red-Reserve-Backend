@@ -15,7 +15,16 @@ const URL = process.env.MONGOURL
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
-app.use(cors({ origin: '*', credentials: true }))
+
+app.use(cors({
+  origin: 'https://red-reserve.vercel.app/', 
+  credentials: true             
+}));
+
+app.options('*', cors({             // handle preflight for all routes
+  origin: 'https://red-reserve.vercel.app/',
+  credentials: true
+}));
 
 // MongoDB connection
 mongoose.connect(URL)
