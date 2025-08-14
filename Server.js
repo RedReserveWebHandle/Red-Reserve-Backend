@@ -22,6 +22,11 @@ app.use(cors({
 }));
 
 
+//test
+router.get('/test', async (req, res) => {
+    res.json({ message: 'Test successful' })
+})
+
 // MongoDB connection
 mongoose.connect(URL)
 const db = mongoose.connection
