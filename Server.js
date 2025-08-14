@@ -17,13 +17,8 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
-  origin: (origin, callback) => callback(null, origin || '*'),
-  credentials: true
-}));
-
-app.options('*', cors({
-  origin: (origin, callback) => callback(null, origin || '*'),
-  credentials: true
+  origin: 'https://rrbackend.vercel.app',
+  credentials: true,
 }));
 
 // MongoDB connection
