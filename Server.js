@@ -18,12 +18,10 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
   origin: '*',
-  credentials: true,
 }));
 
 app.options('*', cors({ 
   origin: '*', 
-  credentials: true 
 }));
 
 // MongoDB connection
