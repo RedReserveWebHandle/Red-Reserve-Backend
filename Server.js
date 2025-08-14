@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
   origin: 'https://red-reserve.vercel.app',
-  credentials: true,
+  //credentials: true,
 }));
 
 
