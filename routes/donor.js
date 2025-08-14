@@ -3,15 +3,17 @@ const router = express.Router()
 const jwt = require('jsonwebtoken')
 const bcryptjs = require('bcryptjs')
 const { Donor, BloodRequest } = require('../models')
+const cors = require('cors');
 
-router.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://red-reserve.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // End preflight request
-  }
-  next();
+// Public routes (no credentials)
+const publicCors = cors({
+  origin: 'https://red-reserve.vercel.app'
+});
+
+// Protected routes (with credentials like cookies/authorization)
+const protectedCors = cors({
+  origin: 'https://red-reserve.vercel.app',
+  credentials: true
 });
 
 function verifyToken(req, res, next) {
@@ -29,7 +31,7 @@ function verifyToken(req, res, next) {
 }
 
 // Signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', publicCors, async (req, res) => {
     const { email, password } = req.body
     if (!email || !password) return res.status(400).json({ message: 'Bad request [400]' })
 
@@ -42,7 +44,7 @@ router.post('/signup', async (req, res) => {
 })
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', publicCors, async (req, res) => {
     const { email, password } = req.body
     if (!email || !password) return res.status(400).json({ message: 'Bad request [400]' })
 
@@ -56,7 +58,7 @@ router.post('/login', async (req, res) => {
 })
 
 // Create Profile
-router.post('/createprofile', verifyToken, async (req, res) => {
+router.post('/createprofile', protectedCors, verifyToken, async (req, res) => {
     const updates = req.body
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor) return res.status(404).json({ message: 'Donor not found [404]' })
@@ -67,7 +69,7 @@ router.post('/createprofile', verifyToken, async (req, res) => {
 })
 
 // Update Profile
-router.post('/updateprofile', verifyToken, async (req, res) => {
+router.post('/updateprofile', protectedCors, verifyToken, async (req, res) => {
     const updates = req.body
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor) return res.status(404).json({ message: 'Donor not found [404]' })
@@ -85,7 +87,7 @@ router.get('/profile', verifyToken, async (req, res) => {
 })
 
 // Get Requests
-router.get('/requests', verifyToken, async (req, res) => {
+router.get('/profile', protectedCors, verifyToken, async (req, res) => {
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor || !donor.profile) return res.status(400).json({ message: 'Profile incomplete [400]' })
 
@@ -97,7 +99,7 @@ router.get('/requests', verifyToken, async (req, res) => {
 })
 
 // Accept Request
-router.post('/accept', verifyToken, async (req, res) => {
+router.post('/accept', protectedCors, verifyToken, async (req, res) => {
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor) return res.status(404).json({ message: 'Donor not found [404]' })
 
@@ -120,7 +122,7 @@ router.post('/accept', verifyToken, async (req, res) => {
 })
 
 // Last Donation
-router.get('/lastdonation', verifyToken, async (req, res) => {
+router.get('/lastdonation', protectedCors, verifyToken, async (req, res) => {
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor || !donor.profile) return res.status(404).json({ message: 'Donor not found or profile missing [404]' })
 
@@ -137,7 +139,7 @@ router.get('/lastdonation', verifyToken, async (req, res) => {
 })
 
 // Cooldown
-router.get('/cooldown', verifyToken, async (req, res) => {
+router.get('/cooldown', protectedCors, verifyToken, async (req, res) => {
     const donor = await Donor.findOne({ email: req.user.email })
     if (!donor || !donor.profile || !donor.profile.lastdonationdate) {
         return res.json({ cooldown: null })
