@@ -18,13 +18,6 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors({
   origin: 'https://red-reserve.vercel.app',
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-}));
-
-// Handle preflight requests
-app.options('*', cors({
-  origin: 'https://red-reserve.vercel.app',
   credentials: true,
 }));
 
