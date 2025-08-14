@@ -16,11 +16,9 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
-const allowedOrigin = 'https://red-reserve.vercel.app';
-
 app.use(cors({
-  origin: allowedOrigin,
-  methods: ["GET","POST"],
+  origin: ['https://red-reserve.vercel.app'],
+  methods: ["POST", "GET"],
   credentials: true,
 }));
 
