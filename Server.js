@@ -21,6 +21,11 @@ app.use(cors({
   credentials: true,
 }));
 
+app.options('*', cors({ 
+  origin: 'https://red-reserve.vercel.app', 
+  credentials: true 
+}));
+
 // MongoDB connection
 mongoose.connect(URL)
 const db = mongoose.connection
