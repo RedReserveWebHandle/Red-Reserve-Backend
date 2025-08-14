@@ -20,11 +20,8 @@ const allowedOrigin = 'https://red-reserve.vercel.app';
 
 app.use(cors({
   origin: allowedOrigin,
+  methods: ["GET","POST"],
   credentials: true,
-}));
-
-app.options('*', cors({
-  origin: allowedOrigin,
 }));
 
 // MongoDB connection
