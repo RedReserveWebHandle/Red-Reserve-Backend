@@ -4,6 +4,16 @@ const jwt = require('jsonwebtoken')
 const bcryptjs = require('bcryptjs')
 const { Donor, BloodRequest } = require('../models')
 
+router.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://red-reserve.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200); // End preflight request
+  }
+  next();
+});
+
 function verifyToken(req, res, next) {
     const authHeader = req.headers['authorization']
     if (!authHeader) return res.status(403).json({ message: 'Token required [403]' })
