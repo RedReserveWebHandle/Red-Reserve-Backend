@@ -111,10 +111,35 @@ router.get('/history', verifyToken, async (req, res) => {
 
 // Other Hospital Requests
 router.get('/others', verifyToken, async (req, res) => {
-    const hospital = await Hospital.findOne({ email: req.user.email })
-    const requests = await BloodRequest.find({ hospitalname: { $ne: hospital.name }, fulfilled: false })
-    res.json(requests)
-})
+    const currentHospital = await Hospital.findOne({ email: req.user.email });
+    if (!currentHospital) return res.status(404).json({ message: 'Hospital not found [404]' });
+
+    const requests = await BloodRequest.find({
+        hospitalname: { $ne: currentHospital.name },
+        fulfilled: false
+    });
+
+    const hospitalNames = [...new Set(requests.map(r => r.hospitalname))];
+    const hospitals = await Hospital.find({ name: { $in: hospitalNames } });
+
+    const hospitalMap = {};
+    hospitals.forEach(h => {
+        hospitalMap[h.name] = {
+            pincode: h.pincode,
+            address: h.address
+        };
+    });
+
+    // Add the extra fields while keeping original request fields intact
+    const augmentedRequests = requests.map(req => ({
+        ...req._doc, // keep all original fields from MongoDB document
+        hospitalpincode: hospitalMap[req.hospitalname]?.pincode || 'NA',
+        hospitaladdress: hospitalMap[req.hospitalname]?.address || 'NA'
+    }));
+
+    res.json(augmentedRequests);
+});
+
 
 // Fulfill Other Hospital Request
 router.post('/fulfillhospital', verifyToken, async (req, res) => {
@@ -128,5 +153,38 @@ router.post('/fulfillhospital', verifyToken, async (req, res) => {
     await request.save()
     res.json({ message: 'Success' })
 })
+
+router.get('/names', verifyToken, async (req, res) => {
+    try {
+        const hospitals = await Hospital.find({}, { name: 1, pincode: 1 });
+
+        // Convert pincodes to lat/lon
+        const withCoordinates = await Promise.all(
+            hospitals.map(async (hospital) => {
+                const url = `https://nominatim.openstreetmap.org/search?postalcode=${hospital.pincode}&country=India&format=json&limit=1`;
+
+                const response = await fetch(url, {
+                    headers: { 'User-Agent': 'HospitalLocator/1.0' }
+                });
+
+                const data = await response.json();
+                if (data.length > 0) {
+                    return {
+                        ...hospital.toObject(),
+                        latitude: parseFloat(data[0].lat),
+                        longitude: parseFloat(data[0].lon)
+                    };
+                }
+                return { ...hospital.toObject(), latitude: null, longitude: null };
+            })
+        );
+
+        res.json(withCoordinates);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 module.exports = router

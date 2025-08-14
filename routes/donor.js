@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const bcryptjs = require('bcryptjs')
-const mongoose = require('mongoose')
 const { Donor, BloodRequest } = require('../models')
 
 function verifyToken(req, res, next) {
@@ -81,7 +80,7 @@ router.get('/requests', verifyToken, async (req, res) => {
     if (!donor || !donor.profile) return res.status(400).json({ message: 'Profile incomplete [400]' })
 
     const requests = await BloodRequest.find({
-        eligiblebloodtypes: donor.profile.bloodgroup,
+        requiredbloodtype: donor.profile.bloodgroup.toUpperCase(),
         fulfilled: false
     })
     res.json(requests)
@@ -98,13 +97,11 @@ router.post('/accept', verifyToken, async (req, res) => {
     if (new Date() < cooldownEnd) {
         return res.status(403).json({ message: `In cooldown until ${cooldownEnd.toDateString()} [403]` })
     }
-
-    donor.profile.lastdonationdate = new Date()
-    donor.profile.lasthospital = req.body.hospitalname || 'Unknown Hospital'
-    await donor.save()
-
-    const request = await BloodRequest.findOne({ hospitalname: req.body.hospitalname, fulfilled: false })
+    const request = await BloodRequest.findById(req.body.requestId)
     if (request) {
+        donor.profile.lastdonationdate = new Date()
+        donor.profile.lasthospital = request.hospitalname || 'Unknown Hospital'
+        await donor.save()
         request.responses.push(donor.email)
         await request.save()
     }
