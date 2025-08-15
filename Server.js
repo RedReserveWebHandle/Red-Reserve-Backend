@@ -1,18 +1,19 @@
 // DONOR + HOSPITAL BACKEND ROUTES
 const express = require('express')
 const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-const bcryptjs = require('bcryptjs')
+const router = express.Router()
 require('dotenv').config()
 const cors = require('cors')
 
+
+const app = express()
+
 app.use(cors({
-  origin: 'https://red-reserve.vercel.app',
+  //origin: 'https://red-reserve.vercel.app',
   //credentials: true,
 }));
 
-const app = express()
 const port = process.env.PORT || 3000
 const URL = process.env.MONGOURL
 
@@ -20,14 +21,6 @@ const URL = process.env.MONGOURL
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
-
-
-
-
-//test
-router.get('/test', async (req, res) => {
-    res.json({ message: 'Test successful' })
-})
 
 // MongoDB connection
 mongoose.connect(URL)
@@ -43,6 +36,11 @@ app.use('/api/donor', donorRoutes)
 // HOSPITAL ROUTES
 const hospitalRoutes = require('./routes/hospital')
 app.use('/api/hospital', hospitalRoutes)
+
+//test
+app.get('/test', async (req, res) => {
+    res.json({ message: 'Test successful' })
+})
 
 // Start Server
 app.listen(port, () => {

@@ -18,6 +18,11 @@ function verifyToken(req, res, next) {
     })
 }
 
+//test
+router.get('/test', async (req, res) => {
+    res.json({ message: 'Test successful' })
+})
+
 // Signup
 router.post('/signup', async (req, res) => {
     const { name, license, contact, pincode, address, email, password } = req.body
