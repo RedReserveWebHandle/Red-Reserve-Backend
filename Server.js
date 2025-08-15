@@ -10,8 +10,8 @@ const cors = require('cors')
 const app = express()
 
 app.use(cors({
-  //origin: 'https://red-reserve.vercel.app',
-  //credentials: true,
+  origin: 'https://red-reserve.vercel.app',
+  credentials: true,
 }));
 
 const port = process.env.PORT || 3000
