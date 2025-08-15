@@ -7,6 +7,11 @@ const bcryptjs = require('bcryptjs')
 require('dotenv').config()
 const cors = require('cors')
 
+app.use(cors({
+  origin: 'https://red-reserve.vercel.app',
+  //credentials: true,
+}));
+
 const app = express()
 const port = process.env.PORT || 3000
 const URL = process.env.MONGOURL
@@ -16,10 +21,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
-app.use(cors({
-  origin: 'https://red-reserve.vercel.app',
-  //credentials: true,
-}));
+
 
 
 //test
